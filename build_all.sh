@@ -99,7 +99,7 @@ cd
 cd ${MAGMA_ROOT}/.cache/feg/ && touch snowflake
 }
 
-Build_Image () {
+Build_FEDImage () {
 cd
 cd ${MAGMA_ROOT}/feg/gateway/docker
 python3 build.py
@@ -177,3 +177,19 @@ docker save cwf_gateway_pipelined | gzip > gateway_pipelined.tar.gz
 
 
 
+Install_APT_Packages
+Install_pip_packages
+Install_vagrant
+Open_network_interfaces
+Clone_code
+Commit_ID
+Build_AGW
+Generate_certs
+Build_FEDImage
+Export_FEDImages
+Build_Orc8r
+Export_ORC8RImages
+Build_NMS
+Export_NMSImages
+Build_CWF
+Export_CWFImages

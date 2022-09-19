@@ -10,11 +10,11 @@ GREEN='\033[0;32m'
 BLACK='\033[0m'
 
 
-
+Pre_requisite () {
 echo -e ${GREEN}#########################################
 echo -e ${GREEN}#    **Pre-requisites**                 #
 echo -e ${GREEN}#########################################${BLACK}
-
+}
 
 Install_APT_Packages () {
 	sudo apt-get install make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git python3-pip virtualbox fabric virtualbox-qt
@@ -35,11 +35,11 @@ Install_vagrant () {
 
 
 
-
+Build_AGW () {
 echo -e ${GREEN}#########################################
 echo -e ${GREEN}#    **Build-AGW**                 
 echo -e ${GREEN}#########################################${BLACK}
-
+}
 
 Open_network_interfaces () {
 	sudo mkdir -p /etc/vbox/
@@ -56,6 +56,7 @@ if [ -d "$DIR" ]; then
 else
   ###  Control will jump here if $DIR does NOT exists ###
   mkdir workspace && cd workspace
+  sudo rm -rf magma
   git clone https://github.com/magma/magma.git
 fi
 }
@@ -68,7 +69,7 @@ git checkout $COMMITID
 export MAGMA_ROOT=$HOME/workspace/magma
 }
 
-Build_AGW () {
+Build_agw () {
 export MAGMA_ROOT=$HOME/workspace/magma
 cd lte/gateway
 sudo modprobe vboxnetadp
@@ -82,11 +83,11 @@ fab release package:destroy_vm=True
 #}
 
 
-
+Build_FED () {
 echo -e ${GREEN}#########################################
 echo -e ${GREEN}#    **Build-FEG**
 echo -e ${GREEN}#########################################${BLACK}
-
+}
 
 Generate_certs () {
 cd 
@@ -119,10 +120,11 @@ docker save feg_gateway_go | gzip > feg_gateway_go.tar.gz
 docker save feg_gateway_python | gzip > feg_gateway_python.tar.gz
 }
 
-
+Build_ORC8R () {
 echo -e ${GREEN}#########################################
 echo -e ${GREEN}#    **Build-ORC8R**
 echo -e ${GREEN}#########################################${BLACK}
+}
 
 Build_Orc8r () {
 cd
@@ -137,10 +139,11 @@ docker save orc8r_nginx | gzip > nginx.tar.gz
 docker save orc8r_controller  | gzip > controller.tar.gz
 }
 
-
+NMS () {
 echo -e ${GREEN}#########################################
 echo -e ${GREEN}#    **Build-NMS**
 echo -e ${GREEN}#########################################${BLACK}
+}
 
 Build_NMS () {
 cd
@@ -154,12 +157,13 @@ cd images
 docker save magmalte_magmalte | gzip > magmalte.tar.gz
 }
 
-
+Build_CWF () {
 echo -e ${GREEN}#########################################
 echo -e ${GREEN}#    **Build-CWF**
 echo -e ${GREEN}#########################################${BLACK}
+}
 
-Build_CWF () {
+Build_CWF_Image () {
 cd
 cd ${MAGMA_ROOT}/cwf/gateway/docker
 docker-compose --file docker-compose.yml --file docker-compose.override.yml build --parallel
@@ -176,20 +180,25 @@ docker save cwf_gateway_pipelined | gzip > gateway_pipelined.tar.gz
 }
 
 
-
+Pre_requisite
 Install_APT_Packages
 Install_pip_packages
 Install_vagrant
+Build_AGW
 Open_network_interfaces
 Clone_code
 Commit_ID
-Build_AGW
+Build_agw
+Build_FED
 Generate_certs
 Build_FEDImage
 Export_FEDImages
+Build_ORC8R
 Build_Orc8r
 Export_ORC8RImages
+NMS
 Build_NMS
 Export_NMSImages
 Build_CWF
+Build_CWF_Image
 Export_CWFImages

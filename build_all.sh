@@ -49,38 +49,35 @@ Open_network_interfaces () {
 }
 
 Clone_code () {
-DIR="$HOME/workspace/magma"
-if [ -d "$DIR" ]; then
-  ### Take action if $DIR exists ###
-  echo "Directory Exists ${DIR}"
-else
-  ###  Control will jump here if $DIR does NOT exists ###
-  mkdir workspace && cd workspace
-  sudo rm -rf magma
-  git clone https://github.com/magma/magma.git
-fi
+	DIR="$HOME/workspace/magma"
+	if [ -d "$DIR" ]; then
+	### Take action if $DIR exists ###
+	echo "Directory Exists ${DIR}"
+	else
+	###  Control will jump here if $DIR does NOT exists ###
+	mkdir workspace && cd workspace
+	sudo rm -rf magma
+	echo "Give repo link"
+	read Repo
+	git clone $Repo
+	fi
 }
 
 Commit_ID () {
-cd magma
-echo "Give the commit id"
-read COMMITID
-git checkout $COMMITID
-export MAGMA_ROOT=$HOME/workspace/magma
+	cd magma
+	echo "Give the Branch Name"
+	read Branch
+	git checkout $Branch
+	export MAGMA_ROOT=$HOME/workspace/magma
 }
 
 Build_agw () {
-export MAGMA_ROOT=$HOME/workspace/magma
-cd lte/gateway
-sudo modprobe vboxnetadp
-vagrant destroy -f
-fab release package:destroy_vm=True
+	export MAGMA_ROOT=$HOME/workspace/magma
+	cd lte/gateway
+	sudo modprobe vboxnetadp
+	vagrant destroy -f
+	fab release package:destroy_vm=True
 }
-
-#Copy_package () {
-#mkdir magma-packages
-#vagrant ssh -c "cp -r magma-packages /vagrant"
-#}
 
 
 Build_FED () {
@@ -90,34 +87,29 @@ echo -e ${GREEN}#########################################${BLACK}
 }
 
 Generate_certs () {
-cd 
-cd ${MAGMA_ROOT} && mkdir -p .cache/test_certs/ && mkdir -p .cache/feg/
-cd ${MAGMA_ROOT}/.cache/test_certs/
-openssl genrsa -out rootCA.key 2048
-openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 365000 -out rootCA.pem -subj "/C=US/CN=rootca.magma.test"
-# create snowflake
-cd
-cd ${MAGMA_ROOT}/.cache/feg/ && touch snowflake
+	cd 
+	cd ${MAGMA_ROOT} && mkdir -p .cache/test_certs/ && mkdir -p .cache/feg/
+	cd ${MAGMA_ROOT}/.cache/test_certs/
+	openssl genrsa -out rootCA.key 2048
+	openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 365000 -out rootCA.pem -subj "/C=US/CN=rootca.magma.test"
+	# create snowflake
+	cd
+	cd ${MAGMA_ROOT}/.cache/feg/ && touch snowflake
 }
 
 Build_FEDImage () {
-cd
-cd ${MAGMA_ROOT}/feg/gateway/docker
-python3 build.py
+	cd
+	cd ${MAGMA_ROOT}/feg/gateway/docker
+	python3 build.py
 }
-
-#echo -e ${GREEN} Run docker containers and check health ${BLACK}
-#cd
-#cd ${MAGMA_ROOT}/feg/gateway/docker
-#python3 build.py -e
 
 
 Export_FEDImages () {
-cd
-mkdir images
-cd images
-docker save feg_gateway_go | gzip > feg_gateway_go.tar.gz
-docker save feg_gateway_python | gzip > feg_gateway_python.tar.gz
+	cd
+	mkdir images
+	cd images
+	docker save feg_gateway_go | gzip > feg_gateway_go.tar.gz
+	docker save feg_gateway_python | gzip > feg_gateway_python.tar.gz
 }
 
 Build_ORC8R () {
@@ -127,16 +119,16 @@ echo -e ${GREEN}#########################################${BLACK}
 }
 
 Build_Orc8r () {
-cd
-cd ${MAGMA_ROOT}/orc8r/cloud/docker
-python3 build.py --all --nocache --parallel
+	cd
+	cd ${MAGMA_ROOT}/orc8r/cloud/docker
+	python3 build.py --all --nocache --parallel
 }
 
 Export_ORC8RImages () {
-cd
-cd images
-docker save orc8r_nginx | gzip > nginx.tar.gz
-docker save orc8r_controller  | gzip > controller.tar.gz
+	cd
+	cd images
+	docker save orc8r_nginx | gzip > nginx.tar.gz
+	docker save orc8r_controller  | gzip > controller.tar.gz
 }
 
 NMS () {
@@ -146,15 +138,15 @@ echo -e ${GREEN}#########################################${BLACK}
 }
 
 Build_NMS () {
-cd
-cd ${MAGMA_ROOT}/nms
-COMPOSE_PROJECT_NAME=magmalte docker-compose build magmalte
+	cd
+	cd ${MAGMA_ROOT}/nms
+	COMPOSE_PROJECT_NAME=magmalte docker-compose build magmalte
 }
 
 Export_NMSImages () {
-cd
-cd images
-docker save magmalte_magmalte | gzip > magmalte.tar.gz
+	cd
+	cd images
+	docker save magmalte_magmalte | gzip > magmalte.tar.gz
 }
 
 Build_CWF () {
@@ -164,19 +156,19 @@ echo -e ${GREEN}#########################################${BLACK}
 }
 
 Build_CWF_Image () {
-cd
-cd ${MAGMA_ROOT}/cwf/gateway/docker
-docker-compose --file docker-compose.yml --file docker-compose.override.yml build --parallel
+	cd
+	cd ${MAGMA_ROOT}/cwf/gateway/docker
+	docker-compose --file docker-compose.yml --file docker-compose.override.yml build --parallel
 }
 
 Export_CWFImages () {
-cd
-cd images
-docker save cwf_cwag_go | gzip > cwag_go.tar.gz
-docker save cwf_gateway_go | gzip > gateway_go.tar.gz
-docker save cwf_gateway_sessiond | gzip > gateway_sessiond.tar.gz
-docker save cwf_gateway_python | gzip > gateway_python.tar.gz
-docker save cwf_gateway_pipelined | gzip > gateway_pipelined.tar.gz
+	cd
+	cd images
+	docker save cwf_cwag_go | gzip > cwag_go.tar.gz
+	docker save cwf_gateway_go | gzip > gateway_go.tar.gz
+	docker save cwf_gateway_sessiond | gzip > gateway_sessiond.tar.gz
+	docker save cwf_gateway_python | gzip > gateway_python.tar.gz
+	docker save cwf_gateway_pipelined | gzip > gateway_pipelined.tar.gz
 }
 
 
